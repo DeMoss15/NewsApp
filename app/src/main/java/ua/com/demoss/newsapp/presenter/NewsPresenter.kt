@@ -1,5 +1,7 @@
 package ua.com.demoss.newsapp.presenter
 
+import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
@@ -15,9 +17,12 @@ import ua.com.demoss.newsapp.model.api.request.QueryMapBuilder
 import ua.com.demoss.newsapp.model.api.response.ApiArticle
 import ua.com.demoss.newsapp.model.api.response.ResponseObject
 import ua.com.demoss.newsapp.model.db.dto.RealmArticle
-import ua.com.demoss.newsapp.ui.ApiArticlesRecyclerViewAdapter
-import ua.com.demoss.newsapp.ui.RealmArticlesRecyclerViewAdapter
+import ua.com.demoss.newsapp.ui.adapter.ApiArticlesRecyclerViewAdapter
+import ua.com.demoss.newsapp.ui.adapter.RealmArticlesRecyclerViewAdapter
 import ua.com.demoss.newsapp.view.NewsView
+import com.facebook.share.model.ShareLinkContent
+
+
 
 @InjectViewState
 class NewsPresenter: MvpPresenter<NewsView>(),
@@ -109,7 +114,10 @@ class NewsPresenter: MvpPresenter<NewsView>(),
 
     // OnApiArticleInteraction *********************************************************************
     override fun share(article: ApiArticle) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val content = ShareLinkContent.Builder()
+                .setContentUrl(Uri.parse(article.url))
+                .build()
+        viewState.shareDialog(content)
     }
 
     override fun addToFavorites(article: ApiArticle) {
