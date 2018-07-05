@@ -12,5 +12,5 @@ data class ResponseObject(
         val totalResults: Int,
         @SerializedName("articles")
         @Expose
-        val articles: ArrayList<ApiArticle>
+        val articles: List<ApiArticle>
 ) {}

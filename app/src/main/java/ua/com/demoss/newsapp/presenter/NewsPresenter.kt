@@ -1,13 +1,17 @@
 package ua.com.demoss.newsapp.presenter
 
+import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import io.realm.Realm
 import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import ua.com.demoss.newsapp.NewsApp
 import ua.com.demoss.newsapp.di.component.DaggerNewsPresenterComponent
 import ua.com.demoss.newsapp.di.component.NewsPresenterComponent
 import ua.com.demoss.newsapp.model.api.NewsApi
+import ua.com.demoss.newsapp.model.api.request.QueryMapBuilder
 import ua.com.demoss.newsapp.model.api.response.ApiArticle
 import ua.com.demoss.newsapp.model.api.response.ResponseObject
 import ua.com.demoss.newsapp.model.db.dto.RealmArticle
@@ -34,16 +38,15 @@ class NewsPresenter: MvpPresenter<NewsView>(),
     private val apiArticlesList = ArrayList<ApiArticle>()
     private val adapterApi = ApiArticlesRecyclerViewAdapter(apiArticlesList, this)
 
-    private var sortBy = ""
-    private var filterBy = ""
     private var pageNumber: Int = 1
 
     private var component: NewsPresenterComponent = DaggerNewsPresenterComponent.builder().appComponent(NewsApp.appComponent).build()
     private var newsApi: NewsApi = component.newsApi()
+    private var queryBuilder = QueryMapBuilder()
 
     // View events *********************************************************************************
     fun onCreate(){
-        getPage()
+        //sendRequest()
         viewState.setAdapter(adapterApi)
     }
 
@@ -51,48 +54,46 @@ class NewsPresenter: MvpPresenter<NewsView>(),
         viewState.setAdapter(adapterRealm)
     }
 
-    fun getFromApi(){
-        getPage()
-        viewState.setAdapter(adapterApi)
+    /*
+    * TODO Change these methods according to UX ...
+    * */
+    fun setQuery(text: String){
+        queryBuilder.query(text)
+        sendRequest()
     }
 
     fun getNextPage(){
-        pageNumber ++
-        getPage()
+        pageNumber++
+        queryBuilder.page(pageNumber)
+        sendRequest()
     }
 
-    fun setFilter(filter: String){
-        filterBy = filter
-        pageNumber = 1
-        getPage()
-    }
-
-    fun setSorted(sortBy: String){
-        this.sortBy = sortBy
-        pageNumber = 1
-        getPage()
+    fun sortBy(sortVariant: String){
+        queryBuilder.sortBy(sortVariant)
+        apiArticlesList.clear()
+        sendRequest()
     }
 
     // Util ****************************************************************************************
-    private fun getPage(){
-        lateinit var call: Call<ResponseObject>
+    private fun sendRequest(){
+        val call = newsApi.getNews(QueryMapBuilder().build())
+        //TODO enqueue call
 
-        when{
-            !sortBy.isBlank() && !filterBy.isBlank() -> {// page of sorted and filtered news
+        call.enqueue(object: Callback<ResponseObject> {
 
+            override fun onResponse(call: Call<ResponseObject>?, response: Response<ResponseObject>?) {
+                Log.i("Api", response?.toString())
+                if (response?.body()?.articles != null) {
+                    apiArticlesList.addAll(response.body()?.articles!!)
+                    adapterApi.notifyDataSetChanged()
+                }
             }
-            !sortBy.isBlank() && filterBy.isBlank() -> {// page of sorted news
 
+            override fun onFailure(call: Call<ResponseObject>?, t: Throwable?) {
+                //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                Log.i("Api", call?.toString())
             }
-            sortBy.isBlank() && !filterBy.isBlank() -> {// page of filtered news
-
-            }
-            sortBy.isBlank() && filterBy.isBlank() -> {// not sorted and not filtered news
-
-            }
-        }
-        // enqueue call
-        adapterApi.notifyDataSetChanged()
+        })
     }
 
     // OnRealmArticleInteraction *******************************************************************
