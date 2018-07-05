@@ -18,6 +18,7 @@ interface NewsApi {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         const val SORT_BY_RELEVANCY = "relevancy"
         const val SORT_BY_POPULARITY = "popularity"
+        const val PAGE_SIZE: Int = 20 //There is no literal for Int, only for Long
     }
 
     @GET("/v2/everything")
