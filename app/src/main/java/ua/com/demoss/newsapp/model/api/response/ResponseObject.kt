@@ -6,11 +6,11 @@ import com.google.gson.annotations.SerializedName
 data class ResponseObject(
         @SerializedName("status")
         @Expose
-        val status: String,
+        val status: String?,
         @SerializedName("totalResults")
         @Expose
-        val totalResults: Int,
+        val totalResults: Int?,
         @SerializedName("articles")
         @Expose
-        val articles: List<ApiArticle>
+        val articles: List<ApiArticle>?
 ) {}

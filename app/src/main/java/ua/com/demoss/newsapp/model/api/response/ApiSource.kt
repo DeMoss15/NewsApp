@@ -9,5 +9,5 @@ data class ApiSource(
         val id: String?,
         @SerializedName("name")
         @Expose
-        val name: String
+        val name: String?
 ) {}

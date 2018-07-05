@@ -5,11 +5,11 @@ import ua.com.demoss.newsapp.model.api.response.ApiSource
 
 open class RealmSource: RealmObject(){
     var id: String? = null
-    lateinit var name: String
+    var name: String? = null
 
-    fun realmSourceFromApiSource(source: ApiSource): RealmSource{
-        id = source.id
-        name = source.name
+    fun realmSourceFromApiSource(source: ApiSource?): RealmSource{
+        id = source?.id
+        name = source?.name
         return this
     }
 }

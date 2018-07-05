@@ -5,12 +5,12 @@ import ua.com.demoss.newsapp.model.api.response.ApiArticle
 
 open class RealmArticle: RealmObject() {
     var source: RealmSource? = null
-    lateinit var author: String
-    lateinit var title: String
-    lateinit var description: String
-    lateinit var url: String
-    lateinit var urlToImage: String
-    lateinit var publishedAt: String
+    var author: String? = null
+    var title: String? = null
+    var description: String? = null
+    var url: String? = null
+    var urlToImage: String? = null
+    var publishedAt: String? = null
 
     fun realmArticleFromApiArticle(article: ApiArticle): RealmArticle{
         source = RealmSource().realmSourceFromApiSource(article.source)
