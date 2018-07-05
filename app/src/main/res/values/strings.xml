@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">News App</string>
+    <string name="api">Api</string>
+    <string name="favorites">Favorites</string>
+    <string name="image_description">Image for catching attention</string>
+    <string name="button">button</string>
 </resources>

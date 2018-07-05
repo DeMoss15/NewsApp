@@ -19,7 +19,7 @@ class QueryMapBuilder {
         queryMap["apiKey"] = "3b199916184a4ef29471a98ef08e8e16"
         queryMap["pageSize"] = PAGE_SIZE.toString()
         queryMap["page"] = "1"
-        //queryMap["q"] = "apple"
+        queryMap["q"] = "apple"
     }
 
     // Query ***************************************************************************************

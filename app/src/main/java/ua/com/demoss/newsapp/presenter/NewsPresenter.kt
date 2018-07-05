@@ -46,12 +46,16 @@ class NewsPresenter: MvpPresenter<NewsView>(),
 
     // View events *********************************************************************************
     fun onCreate(){
-        //sendRequest()
         viewState.setAdapter(adapterApi)
+        sendRequest()
     }
 
-    fun getFavorites(){
+    fun switchToFavorites(){
         viewState.setAdapter(adapterRealm)
+    }
+
+    fun switchToApi(){
+        viewState.setAdapter(adapterApi)
     }
 
     /*
@@ -77,7 +81,6 @@ class NewsPresenter: MvpPresenter<NewsView>(),
     // Util ****************************************************************************************
     private fun sendRequest(){
         val call = newsApi.getNews(QueryMapBuilder().build())
-        //TODO enqueue call
 
         call.enqueue(object: Callback<ResponseObject> {
 
@@ -97,10 +100,6 @@ class NewsPresenter: MvpPresenter<NewsView>(),
     }
 
     // OnRealmArticleInteraction *******************************************************************
-    override fun share(article: RealmArticle) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun removeFromFavorites(article: RealmArticle) {
         realm.beginTransaction()
         realmArticlesList.deleteFromRealm(realmArticlesList.indexOf(article))
