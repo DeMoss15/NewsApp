@@ -3,8 +3,8 @@ package ua.com.demoss.newsapp.model.db.dto
 import io.realm.RealmObject
 import ua.com.demoss.newsapp.model.api.response.ApiArticle
 
-class RealmArticle: RealmObject() {
-    lateinit var source: RealmSource
+open class RealmArticle: RealmObject() {
+    var source: RealmSource? = null
     lateinit var author: String
     lateinit var title: String
     lateinit var description: String
