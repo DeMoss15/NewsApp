@@ -22,7 +22,7 @@ class NewsApp: Application() {
         val configuration = RealmConfiguration
                 .Builder()
                 .name("newsappdb.realm")
-                .schemaVersion(1)
+                .schemaVersion(2)
                 .migration(RealmMigrations())
                 .build()
         Realm.setDefaultConfiguration(configuration)
