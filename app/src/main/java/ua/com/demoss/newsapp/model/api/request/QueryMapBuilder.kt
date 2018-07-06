@@ -1,7 +1,9 @@
 package ua.com.demoss.newsapp.model.api.request
 
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 class QueryMapBuilder {
 
@@ -24,6 +26,7 @@ class QueryMapBuilder {
 
     // Query ***************************************************************************************
     fun query(text: String){
+        queryMap.remove("q")
         queryMap["q"] = text
     }
 
@@ -67,6 +70,7 @@ class QueryMapBuilder {
 
     // Builder *************************************************************************************
     fun build(): Map<String, String>{
+        Log.i("Api", queryMap.toString())
         return queryMap
     }
 }

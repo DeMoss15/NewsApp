@@ -1,33 +1,30 @@
 package ua.com.demoss.newsapp.presenter
 
 import android.net.Uri
-import android.provider.Settings
-import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import io.realm.Realm
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import ua.com.demoss.newsapp.NewsApp
 import ua.com.demoss.newsapp.di.component.DaggerNewsPresenterComponent
 import ua.com.demoss.newsapp.di.component.NewsPresenterComponent
 import ua.com.demoss.newsapp.model.api.NewsApi
 import ua.com.demoss.newsapp.model.api.request.QueryMapBuilder
 import ua.com.demoss.newsapp.model.api.response.ApiArticle
-import ua.com.demoss.newsapp.model.api.response.ResponseObject
 import ua.com.demoss.newsapp.model.db.dto.RealmArticle
 import ua.com.demoss.newsapp.ui.adapter.ApiArticlesRecyclerViewAdapter
 import ua.com.demoss.newsapp.ui.adapter.RealmArticlesRecyclerViewAdapter
 import ua.com.demoss.newsapp.view.NewsView
 import com.facebook.share.model.ShareLinkContent
-
+import retrofit2.Response
+import ua.com.demoss.newsapp.model.api.AsyncTaskRequest
+import ua.com.demoss.newsapp.model.api.response.ResponseObject
 
 
 @InjectViewState
 class NewsPresenter: MvpPresenter<NewsView>(),
         RealmArticlesRecyclerViewAdapter.OnRealmArticleInteraction,
-        ApiArticlesRecyclerViewAdapter.OnApiArticleInteraction {
+        ApiArticlesRecyclerViewAdapter.OnApiArticleInteraction,
+        AsyncTaskRequest.AsyncTaskRequestListener {
 
     /**
      * The question is: we need two different classes for data: ApiArticle and RealmArticle
@@ -67,6 +64,7 @@ class NewsPresenter: MvpPresenter<NewsView>(),
     * TODO Change these methods according to UX ...
     * */
     fun setQuery(text: String){
+        apiArticlesList.clear()
         queryBuilder.query(text)
         sendRequest()
     }
@@ -85,23 +83,8 @@ class NewsPresenter: MvpPresenter<NewsView>(),
 
     // Util ****************************************************************************************
     private fun sendRequest(){
-        val call = newsApi.getNews(QueryMapBuilder().build())
-
-        call.enqueue(object: Callback<ResponseObject> {
-
-            override fun onResponse(call: Call<ResponseObject>?, response: Response<ResponseObject>?) {
-                Log.i("Api", response?.toString())
-                if (response?.body()?.articles != null) {
-                    apiArticlesList.addAll(response.body()?.articles!!)
-                    adapterApi.notifyDataSetChanged()
-                }
-            }
-
-            override fun onFailure(call: Call<ResponseObject>?, t: Throwable?) {
-                //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                Log.i("Api", call?.toString())
-            }
-        })
+        val asyncRequest = AsyncTaskRequest(newsApi, this)
+        asyncRequest.execute(queryBuilder.build())
     }
 
     // OnRealmArticleInteraction *******************************************************************
@@ -126,4 +109,14 @@ class NewsPresenter: MvpPresenter<NewsView>(),
         realm.commitTransaction()
         adapterRealm.notifyDataSetChanged()
     }
+
+    // AsyncTaskRequestListener ********************************************************************
+    override fun onPostExecute(response: Response<ResponseObject>?) {
+        if (response?.body()?.articles != null) {
+            apiArticlesList.addAll(response.body()?.articles!!)
+            adapterApi.notifyDataSetChanged()
+        }
+    }
+
+
 }
