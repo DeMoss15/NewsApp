@@ -18,6 +18,7 @@ import com.facebook.share.model.ShareLinkContent
 import retrofit2.Response
 import ua.com.demoss.newsapp.model.api.AsyncTaskRequest
 import ua.com.demoss.newsapp.model.api.response.ResponseObject
+import java.util.*
 
 
 @InjectViewState
@@ -26,9 +27,9 @@ class NewsPresenter: MvpPresenter<NewsView>(),
         ApiArticlesRecyclerViewAdapter.OnApiArticleInteraction,
         AsyncTaskRequest.AsyncTaskRequestListener {
 
-    /**
+    /*
      * The question is: we need two different classes for data: ApiArticle and RealmArticle
-     * because classes that inherit RealmObject can't be data class (they have to have an empty constructor)
+     * because classes that inherit RealmObject can't be a data class (they must have an empty constructor)
      * but for retrofit responses I use data classes. I find it very useful
      */
 
@@ -64,20 +65,35 @@ class NewsPresenter: MvpPresenter<NewsView>(),
     * TODO Change these methods according to UX ...
     * */
     fun setQuery(text: String){
-        apiArticlesList.clear()
         queryBuilder.query(text)
         sendRequest()
     }
 
     fun getNextPage(){
+        pageFlag = true
         pageNumber++
         queryBuilder.page(pageNumber)
+        sendRequest()
+    }
+
+    fun setFrom(date: Calendar){
+        queryBuilder.from(date)
+        sendRequest()
+    }
+
+    fun setTo(date: Calendar){
+        queryBuilder.to(date)
         sendRequest()
     }
 
     fun sortBy(sortVariant: String){
         queryBuilder.sortBy(sortVariant)
         apiArticlesList.clear()
+        sendRequest()
+    }
+
+    fun setSources(sources: List<String>){
+        queryBuilder.sources(sources)
         sendRequest()
     }
 
@@ -111,12 +127,18 @@ class NewsPresenter: MvpPresenter<NewsView>(),
     }
 
     // AsyncTaskRequestListener ********************************************************************
+    // Yeah, I know flags isn't good but I don't know another way ... =(
+    var pageFlag = false
+
     override fun onPostExecute(response: Response<ResponseObject>?) {
+        if (pageFlag) {
+            pageFlag = false
+        } else {
+            apiArticlesList.clear()
+        }
         if (response?.body()?.articles != null) {
             apiArticlesList.addAll(response.body()?.articles!!)
             adapterApi.notifyDataSetChanged()
         }
     }
-
-
 }

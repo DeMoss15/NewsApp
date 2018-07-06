@@ -17,7 +17,6 @@ class QueryMapBuilder {
     private val queryMap = HashMap<String, String>()
 
     init {
-        //TODO("put here api key")
         queryMap["apiKey"] = "3b199916184a4ef29471a98ef08e8e16"
         queryMap["pageSize"] = PAGE_SIZE.toString()
         queryMap["page"] = "1"

@@ -10,4 +10,5 @@ interface NewsView: MvpView {
     fun setAdapter(adapter: RealmArticlesRecyclerViewAdapter)
     fun setAdapter(adapter: ApiArticlesRecyclerViewAdapter)
     fun shareDialog(content: ShareLinkContent)
+    fun showToast(text: String)
 }

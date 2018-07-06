@@ -42,7 +42,7 @@
         app:layout_constraintBottom_toTopOf="@+id/activity_main_button_favorites"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity_main_search_view_query"
+        app:layout_constraintTop_toBottomOf="@+id/activity_main_text_view_from_date"
         tools:listitem="@layout/item_article" />
 
     <SearchView
@@ -56,5 +56,41 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/activity_main_spinner_sort_by"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activity_main_search_view_query" />
+
+    <TextView
+        android:id="@+id/activity_main_text_view_from_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="From: "
+        app:layout_constraintEnd_toStartOf="@+id/activity_main_text_view_to_date"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activity_main_spinner_sort_by" />
+
+    <TextView
+        android:id="@+id/activity_main_text_view_to_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="To: "
+        app:layout_constraintBottom_toBottomOf="@+id/activity_main_text_view_from_date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/activity_main_text_view_from_date"
+        app:layout_constraintTop_toTopOf="@+id/activity_main_text_view_from_date" />
 
 </android.support.constraint.ConstraintLayout>
