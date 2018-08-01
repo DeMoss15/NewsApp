@@ -67,8 +67,9 @@ dependencies {
     annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
     kapt 'com.google.dagger:dagger-compiler:2.11'
 
-    // Picasso
-    implementation 'com.squareup.picasso:picasso:2.71828'
+    // Glide
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
 
     // FacebookSDK
     implementation 'com.facebook.android:facebook-share:4.34.0'

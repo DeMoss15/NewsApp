@@ -41,15 +41,6 @@ class QueryMapBuilder {
     }
 
     // Filtering ***********************************************************************************
-
-    // sources ================
-    /**
-     * [sources] may contains only maximum 20 elements
-     */
-    fun sources(sources: List<String>){
-        queryMap["sources"] = sources.joinToString(",")
-    }
-
     // date ================
     fun from(date: String){
         queryMap["from"] = date

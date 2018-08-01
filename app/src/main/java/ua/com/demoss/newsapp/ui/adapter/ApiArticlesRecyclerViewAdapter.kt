@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_article.view.*
 import ua.com.demoss.newsapp.R
 import ua.com.demoss.newsapp.model.api.response.ApiArticle
@@ -28,7 +28,9 @@ class ApiArticlesRecyclerViewAdapter(
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         holder.item = list[position]
         holder.textViewName.text = holder.item.title
-        Picasso.get().load(holder.item.urlToImage).into(holder.imageView)
+        Glide.with(holder.view.context)
+                .load(holder.item.urlToImage)
+                .into(holder.imageView)
         holder.imageButtonDownload.setOnClickListener { listener.onDownload(holder.item) }
         holder.imageButtonShare.setOnClickListener { listener.onShare(holder.item) }
         holder.view.setOnClickListener { listener.onItemClick(holder.item) }

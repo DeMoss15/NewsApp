@@ -28,12 +28,6 @@ class NewsPresenter: MvpPresenter<NewsView>(),
         RealmArticlesRecyclerViewAdapter.OnRealmArticleInteraction,
         ApiArticlesRecyclerViewAdapter.OnApiArticleInteraction {
 
-    /*
-     * The question is: we need two different classes for data: ApiArticle and RealmArticle
-     * because classes that inherit RealmObject can't be a data class (they must have an empty constructor)
-     * but for retrofit responses I use data classes. I find it very useful
-     */
-
     // Variables ***********************************************************************************
     private val realm = Realm.getDefaultInstance()
     private val realmArticlesList = realm.where(RealmArticle::class.java).findAll()
@@ -93,11 +87,6 @@ class NewsPresenter: MvpPresenter<NewsView>(),
         sendRequest()
     }
 
-    fun setSources(sources: List<String>){
-        queryBuilder.sources(sources)
-        sendRequest()
-    }
-
     // Util ****************************************************************************************
     private fun sendRequest(){
         val result = newsApi.getNews(queryBuilder.build())
@@ -127,8 +116,7 @@ class NewsPresenter: MvpPresenter<NewsView>(),
             }
 
             override fun onFailure(call: Call<ResponseObject>?, t: Throwable?) {
-                //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                Log.i("Api", call?.toString())
+                Log.e("Api", call?.toString())
             }
         })
     }
