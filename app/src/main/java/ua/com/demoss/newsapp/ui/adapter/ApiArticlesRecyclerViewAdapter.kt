@@ -29,19 +29,22 @@ class ApiArticlesRecyclerViewAdapter(
         holder.item = list[position]
         holder.textViewName.text = holder.item.title
         Picasso.get().load(holder.item.urlToImage).into(holder.imageView)
-        holder.imageButton.setOnClickListener { listener.addToFavorites(holder.item) }
-        holder.view.setOnClickListener { listener.share(holder.item) }
+        holder.imageButtonDownload.setOnClickListener { listener.onDownload(holder.item) }
+        holder.imageButtonShare.setOnClickListener { listener.onShare(holder.item) }
+        holder.view.setOnClickListener { listener.onItemClick(holder.item) }
     }
 
     inner class NewsViewHolder(val view: View): RecyclerView.ViewHolder(view){
         lateinit var item: ApiArticle
         val textViewName = view.item_article_text_view_title!!
         val imageView = view.item_article_image_view!!
-        val imageButton = view.item_article_image_button_download!!
+        val imageButtonDownload = view.item_article_image_button_download!!
+        val imageButtonShare = view.item_article_image_button_share!!
     }
 
     interface OnApiArticleInteraction{
-        fun share(article: ApiArticle)
-        fun addToFavorites(article: ApiArticle)
+        fun onShare(article: ApiArticle)
+        fun onDownload(article: ApiArticle)
+        fun onItemClick(article: ApiArticle)
     }
 }

@@ -1,6 +1,7 @@
 package ua.com.demoss.newsapp.ui
 
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -19,6 +20,9 @@ import java.util.*
 import android.view.View
 import android.widget.*
 import ua.com.demoss.newsapp.model.api.request.QueryMapBuilder
+import android.support.customtabs.CustomTabsIntent
+
+
 
 
 class MainActivity : MvpAppCompatActivity(), NewsView, DatePickerDialog.OnDateSetListener {
@@ -43,18 +47,18 @@ class MainActivity : MvpAppCompatActivity(), NewsView, DatePickerDialog.OnDateSe
         activity_main_button_api.setOnClickListener { presenter.switchToApi() }
 
         activity_main_recycler_view_articles.layoutManager = LinearLayoutManager(this)
-        // setOnScrollListener is deprecated ?!
-        activity_main_recycler_view_articles.setOnScrollListener(object: RecyclerView.OnScrollListener(){
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0){// Recycle view scrolling downwards...
+        activity_main_recycler_view_articles.addOnScrollListener(object: RecyclerView.OnScrollListener(){
+                    override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        if (dy > 0){// Recycle view scrolling downwards...
 
-                    if (!recyclerView?.canScrollVertically(RecyclerView.FOCUS_DOWN)!!){// can't scroll more
-                        presenter.getNextPage()
+                            if (!recyclerView?.canScrollVertically(RecyclerView.FOCUS_DOWN)!!){// can't scroll more
+                                presenter.getNextPage()
+                            }
+                        }
                     }
                 }
-            }
-        })
+        )
 
         activity_main_search_view_query.setOnQueryTextListener(object: android.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
@@ -120,7 +124,13 @@ class MainActivity : MvpAppCompatActivity(), NewsView, DatePickerDialog.OnDateSe
     }
 
     override fun showToast(text: String) {
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun openUri(url: String) {
+        val builder = CustomTabsIntent.Builder()
+        val customTabsIntent = builder.build()
+        customTabsIntent.launchUrl(this, Uri.parse(url))
     }
 
     // OnDateSetListener ***************************************************************************

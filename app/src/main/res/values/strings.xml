@@ -5,4 +5,7 @@
     <string name="favorites">Favorites</string>
     <string name="image_description">Image for catching attention</string>
     <string name="button">button</string>
+    <string name="share_button">share</string>
+    <string name="from">From:</string>
+    <string name="to">To:</string>
 </resources>

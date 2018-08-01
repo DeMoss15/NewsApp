@@ -1,5 +1,6 @@
 package ua.com.demoss.newsapp.view
 
+import android.net.Uri
 import com.arellomobile.mvp.MvpView
 import com.facebook.share.model.ShareLinkContent
 import ua.com.demoss.newsapp.ui.adapter.ApiArticlesRecyclerViewAdapter
@@ -11,4 +12,5 @@ interface NewsView: MvpView {
     fun setAdapter(adapter: ApiArticlesRecyclerViewAdapter)
     fun shareDialog(content: ShareLinkContent)
     fun showToast(text: String)
+    fun openUri(url: String)
 }

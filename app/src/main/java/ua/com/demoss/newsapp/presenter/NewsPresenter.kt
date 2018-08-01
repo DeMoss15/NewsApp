@@ -1,6 +1,7 @@
 package ua.com.demoss.newsapp.presenter
 
 import android.net.Uri
+import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import io.realm.Realm
@@ -15,8 +16,9 @@ import ua.com.demoss.newsapp.ui.adapter.ApiArticlesRecyclerViewAdapter
 import ua.com.demoss.newsapp.ui.adapter.RealmArticlesRecyclerViewAdapter
 import ua.com.demoss.newsapp.view.NewsView
 import com.facebook.share.model.ShareLinkContent
+import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
-import ua.com.demoss.newsapp.model.api.AsyncTaskRequest
 import ua.com.demoss.newsapp.model.api.response.ResponseObject
 import java.util.*
 
@@ -24,8 +26,7 @@ import java.util.*
 @InjectViewState
 class NewsPresenter: MvpPresenter<NewsView>(),
         RealmArticlesRecyclerViewAdapter.OnRealmArticleInteraction,
-        ApiArticlesRecyclerViewAdapter.OnApiArticleInteraction,
-        AsyncTaskRequest.AsyncTaskRequestListener {
+        ApiArticlesRecyclerViewAdapter.OnApiArticleInteraction {
 
     /*
      * The question is: we need two different classes for data: ApiArticle and RealmArticle
@@ -99,8 +100,37 @@ class NewsPresenter: MvpPresenter<NewsView>(),
 
     // Util ****************************************************************************************
     private fun sendRequest(){
-        val asyncRequest = AsyncTaskRequest(newsApi, this)
-        asyncRequest.execute(queryBuilder.build())
+        val result = newsApi.getNews(queryBuilder.build())
+        result.enqueue(object: Callback<ResponseObject> {
+
+            override fun onResponse(call: Call<ResponseObject>?, response: Response<ResponseObject>?) {
+                Log.i("Api", response?.toString())
+
+                when { // Handling HTTP response code
+                    response?.code().toString().startsWith("1") ->{
+                        viewState.showToast("informational ${response?.code().toString()}")
+                    }
+                    response?.code().toString().startsWith("2") ->{
+                        viewState.showToast("success ${response?.code().toString()}")
+                        onReceiveResponse(response!!)
+                    }
+                    response?.code().toString().startsWith("3") ->{
+                        viewState.showToast("redirection ${response?.code().toString()}")
+                    }
+                    response?.code().toString().startsWith("4") ->{
+                        viewState.showToast("client error ${response?.code().toString()}")
+                    }
+                    response?.code().toString().startsWith("5") ->{
+                        viewState.showToast("server error ${response?.code().toString()}")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseObject>?, t: Throwable?) {
+                //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                Log.i("Api", call?.toString())
+            }
+        })
     }
 
     // OnRealmArticleInteraction *******************************************************************
@@ -112,33 +142,43 @@ class NewsPresenter: MvpPresenter<NewsView>(),
     }
 
     // OnApiArticleInteraction *********************************************************************
-    override fun share(article: ApiArticle) {
+    override fun onShare(article: ApiArticle) {
         val content = ShareLinkContent.Builder()
                 .setContentUrl(Uri.parse(article.url))
                 .build()
         viewState.shareDialog(content)
     }
 
-    override fun addToFavorites(article: ApiArticle) {
+    override fun onDownload(article: ApiArticle) {
         realm.beginTransaction()
         realm.copyToRealm(RealmArticle().realmArticleFromApiArticle(article))
         realm.commitTransaction()
         adapterRealm.notifyDataSetChanged()
     }
 
-    // AsyncTaskRequestListener ********************************************************************
+    override fun onItemClick(article: ApiArticle) {
+        article.url?.let { viewState.openUri(it) }
+    }
+
+    // Util ****************************************************************************************
     // Yeah, I know flags isn't good but I don't know another way ... =(
     var pageFlag = false
 
-    override fun onPostExecute(response: Response<ResponseObject>?) {
+    fun onReceiveResponse(response: Response<ResponseObject>) {
         if (pageFlag) {
             pageFlag = false
         } else {
             apiArticlesList.clear()
         }
-        if (response?.body()?.articles != null) {
+
+        try {
             apiArticlesList.addAll(response.body()?.articles!!)
             adapterApi.notifyDataSetChanged()
         }
+        catch (e: NullPointerException){
+            Log.i("presenter", "response.body()?.articles!! is null \n${e.toString()}")
+            viewState.showToast("Ooops! Something went wrong...")
+        }
+
     }
 }

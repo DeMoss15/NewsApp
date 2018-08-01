@@ -31,6 +31,7 @@ class RealmArticlesRecyclerViewAdapter(
         Picasso.get().load(holder.item.urlToImage).into(holder.imageView)
         holder.imageButton.setImageResource(R.drawable.ic_close_24dp)
         holder.imageButton.setOnClickListener { listener.removeFromFavorites(holder.item) }
+        holder.imageButtonShare.visibility = View.GONE
     }
 
     inner class NewsViewHolder(val view: View): RecyclerView.ViewHolder(view){
@@ -38,6 +39,7 @@ class RealmArticlesRecyclerViewAdapter(
         val textViewName = view.item_article_text_view_title!!
         val imageView = view.item_article_image_view!!
         val imageButton = view.item_article_image_button_download!!
+        val imageButtonShare = view.item_article_image_button_share!!
     }
 
     interface OnRealmArticleInteraction{
