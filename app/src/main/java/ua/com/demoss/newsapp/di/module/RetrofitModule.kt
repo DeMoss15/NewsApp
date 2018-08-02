@@ -1,5 +1,6 @@
 package ua.com.demoss.newsapp.di.module
 
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -16,6 +17,7 @@ class RetrofitModule {
             Retrofit.Builder()
                     .baseUrl("https://newsapi.org")
                     .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .client(client)
                     .build()
 }

@@ -21,10 +21,13 @@
     <TextView
         android:id="@+id/item_article_text_view_title"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="23dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/item_article_image_button_download"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,10 +53,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:background="@android:color/transparent"
+        android:contentDescription="@string/share_button"
         android:tint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="@+id/item_article_image_button_download"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/item_article_image_button_download"
-        app:srcCompat="@drawable/ic_share_24dp"
-        android:contentDescription="@string/share_button" />
+        app:srcCompat="@drawable/ic_share_24dp" />
+
 </android.support.constraint.ConstraintLayout>

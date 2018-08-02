@@ -16,6 +16,8 @@ import ua.com.demoss.newsapp.ui.adapter.ApiArticlesRecyclerViewAdapter
 import ua.com.demoss.newsapp.ui.adapter.RealmArticlesRecyclerViewAdapter
 import ua.com.demoss.newsapp.view.NewsView
 import com.facebook.share.model.ShareLinkContent
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -89,36 +91,33 @@ class NewsPresenter: MvpPresenter<NewsView>(),
 
     // Util ****************************************************************************************
     private fun sendRequest(){
-        val result = newsApi.getNews(queryBuilder.build())
-        result.enqueue(object: Callback<ResponseObject> {
-
-            override fun onResponse(call: Call<ResponseObject>?, response: Response<ResponseObject>?) {
-                Log.i("Api", response?.toString())
-
-                when { // Handling HTTP response code
-                    response?.code().toString().startsWith("1") ->{
-                        viewState.showToast("informational ${response?.code().toString()}")
-                    }
-                    response?.code().toString().startsWith("2") ->{
-                        viewState.showToast("success ${response?.code().toString()}")
-                        onReceiveResponse(response!!)
-                    }
-                    response?.code().toString().startsWith("3") ->{
-                        viewState.showToast("redirection ${response?.code().toString()}")
-                    }
-                    response?.code().toString().startsWith("4") ->{
-                        viewState.showToast("client error ${response?.code().toString()}")
-                    }
-                    response?.code().toString().startsWith("5") ->{
-                        viewState.showToast("server error ${response?.code().toString()}")
+        newsApi.getNews(queryBuilder.build())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError {e ->
+                    Log.e("presenter", e.toString())
+                }
+                .subscribe{ response ->
+                    Log.i("presenter", "doOnNext")
+                    when { // Handling HTTP response code
+                        response?.code().toString().startsWith("1") ->{
+                            viewState.showToast("informational ${response?.code().toString()}")
+                        }
+                        response?.code().toString().startsWith("2") ->{
+                            viewState.showToast("success ${response?.code().toString()}")
+                            onReceiveResponse(response!!)
+                        }
+                        response?.code().toString().startsWith("3") ->{
+                            viewState.showToast("redirection ${response?.code().toString()}")
+                        }
+                        response?.code().toString().startsWith("4") ->{
+                            viewState.showToast("client error ${response?.code().toString()}")
+                        }
+                        response?.code().toString().startsWith("5") ->{
+                            viewState.showToast("server error ${response?.code().toString()}")
+                        }
                     }
                 }
-            }
-
-            override fun onFailure(call: Call<ResponseObject>?, t: Throwable?) {
-                Log.e("Api", call?.toString())
-            }
-        })
     }
 
     // OnRealmArticleInteraction *******************************************************************
@@ -152,19 +151,20 @@ class NewsPresenter: MvpPresenter<NewsView>(),
     // Yeah, I know flags isn't good but I don't know another way ... =(
     var pageFlag = false
 
-    fun onReceiveResponse(response: Response<ResponseObject>) {
+    private fun onReceiveResponse(response: Response<ResponseObject>) {
         if (pageFlag) {
             pageFlag = false
         } else {
             apiArticlesList.clear()
         }
 
+        Log.i("presenter", "onReceiveResponse")
         try {
             apiArticlesList.addAll(response.body()?.articles!!)
             adapterApi.notifyDataSetChanged()
         }
         catch (e: NullPointerException){
-            Log.i("presenter", "response.body()?.articles!! is null \n${e.toString()}")
+            Log.e("presenter", "response.body()?.articles!! is null \n${e.toString()}")
             viewState.showToast("Ooops! Something went wrong...")
         }
 
