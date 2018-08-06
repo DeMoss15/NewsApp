@@ -1,6 +1,8 @@
 package ua.com.demoss.newsapp.ui
 
 import android.app.DatePickerDialog
+import android.content.Context
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -107,7 +109,7 @@ class MainActivity : MvpAppCompatActivity(), NewsView, DatePickerDialog.OnDateSe
             }
         }
 
-        presenter.onCreate()
+        presenter.onCreate(getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
     }
 
     // NewsView ************************************************************************************

@@ -1,6 +1,5 @@
 package ua.com.demoss.newsapp.view
 
-import android.net.Uri
 import com.arellomobile.mvp.MvpView
 import com.facebook.share.model.ShareLinkContent
 import ua.com.demoss.newsapp.ui.adapter.ApiArticlesRecyclerViewAdapter

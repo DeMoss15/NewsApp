@@ -18,11 +18,10 @@ import ua.com.demoss.newsapp.view.NewsView
 import com.facebook.share.model.ShareLinkContent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 import ua.com.demoss.newsapp.model.api.response.ResponseObject
 import java.util.*
+import android.net.ConnectivityManager
 
 
 @InjectViewState
@@ -44,9 +43,11 @@ class NewsPresenter: MvpPresenter<NewsView>(),
     private var newsApi: NewsApi = component.newsApi()
     private var queryBuilder = QueryMapBuilder()
 
+    lateinit var connectivityManager: ConnectivityManager
     // View events *********************************************************************************
-    fun onCreate(){
+    fun onCreate(connectivityManager: ConnectivityManager){
         viewState.setAdapter(adapterApi)
+        this.connectivityManager = connectivityManager
         sendRequest()
     }
 
@@ -91,35 +92,37 @@ class NewsPresenter: MvpPresenter<NewsView>(),
 
     // Util ****************************************************************************************
     private fun sendRequest(){
-        newsApi.getNews(queryBuilder.build())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError {e ->
-                    Log.e("presenter", e.toString())
-                }
-                .subscribe{ response ->
-                    Log.i("presenter", "doOnNext")
-                    when { // Handling HTTP response code
-                        response?.code().toString().startsWith("1") ->{
-                            viewState.showToast("informational ${response?.code().toString()}")
-                        }
-                        response?.code().toString().startsWith("2") ->{
-                            viewState.showToast("success ${response?.code().toString()}")
-                            onReceiveResponse(response!!)
-                        }
-                        response?.code().toString().startsWith("3") ->{
-                            viewState.showToast("redirection ${response?.code().toString()}")
-                        }
-                        response?.code().toString().startsWith("4") ->{
-                            viewState.showToast("client error ${response?.code().toString()}")
-                        }
-                        response?.code().toString().startsWith("5") ->{
-                            viewState.showToast("server error ${response?.code().toString()}")
+        if (connectivityManager.activeNetworkInfo != null && connectivityManager.activeNetworkInfo.isConnectedOrConnecting) {
+            newsApi.getNews(queryBuilder.build())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError { e ->
+                        Log.e("presenter", e.toString())
+                    }
+                    .subscribe { response ->
+                        Log.i("presenter", "doOnNext")
+                        val code = response.code().toString()
+                        when { // Handling HTTP response code
+                            code.startsWith("1") -> {
+                                viewState.showToast("informational $code")
+                            }
+                            code.startsWith("2") -> {
+                                viewState.showToast("success $code")
+                                onReceiveResponse(response!!)
+                            }
+                            code.startsWith("3") -> {
+                                viewState.showToast("redirection $code")
+                            }
+                            code.startsWith("4") -> {
+                                viewState.showToast("client error $code")
+                            }
+                            code.startsWith("5") -> {
+                                viewState.showToast("server error $code")
+                            }
                         }
                     }
-                }
+        }
     }
-
     // OnRealmArticleInteraction *******************************************************************
     override fun removeFromFavorites(article: RealmArticle) {
         realm.beginTransaction()
