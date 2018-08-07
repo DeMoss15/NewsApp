@@ -142,7 +142,7 @@ class MainActivity : MvpAppCompatActivity(), NewsView, DatePickerDialog.OnDateSe
 
         if (firstDate == null) {
             activity_main_text_view_from_date.text = StringBuilder("From: ${sdf.format(date.time)}").toString()
-            presenter.setTo(date)
+            presenter.setFrom(date)
             firstDate = date
         } else {
             if (date < firstDate){

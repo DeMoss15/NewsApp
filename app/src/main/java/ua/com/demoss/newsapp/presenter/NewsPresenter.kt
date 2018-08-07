@@ -4,7 +4,6 @@ import android.net.Uri
 import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
-import io.realm.Realm
 import ua.com.demoss.newsapp.NewsApp
 import ua.com.demoss.newsapp.di.component.DaggerNewsPresenterComponent
 import ua.com.demoss.newsapp.di.component.NewsPresenterComponent
@@ -22,6 +21,7 @@ import retrofit2.Response
 import ua.com.demoss.newsapp.model.api.response.ResponseObject
 import java.util.*
 import android.net.ConnectivityManager
+import ua.com.demoss.newsapp.model.repository.local.ArticleLocalRepository
 
 
 @InjectViewState
@@ -30,25 +30,24 @@ class NewsPresenter: MvpPresenter<NewsView>(),
         ApiArticlesRecyclerViewAdapter.OnApiArticleInteraction {
 
     // Variables ***********************************************************************************
-    private val realm = Realm.getDefaultInstance()
-    private val realmArticlesList = realm.where(RealmArticle::class.java).findAll()
+    private var component: NewsPresenterComponent = DaggerNewsPresenterComponent.builder().appComponent(NewsApp.appComponent).build()
+    private var newsApi: NewsApi = component.newsApi()
+    private val localRepo: ArticleLocalRepository = component.localRepository()
+
+    private val realmArticlesList = localRepo.get()
     private val adapterRealm = RealmArticlesRecyclerViewAdapter(realmArticlesList, this)
 
     private val apiArticlesList = ArrayList<ApiArticle>()
     private val adapterApi = ApiArticlesRecyclerViewAdapter(apiArticlesList, this)
 
     private var pageNumber: Int = 1
-
-    private var component: NewsPresenterComponent = DaggerNewsPresenterComponent.builder().appComponent(NewsApp.appComponent).build()
-    private var newsApi: NewsApi = component.newsApi()
     private var queryBuilder = QueryMapBuilder()
 
     lateinit var connectivityManager: ConnectivityManager
     // View events *********************************************************************************
     fun onCreate(connectivityManager: ConnectivityManager){
-        viewState.setAdapter(adapterApi)
+        viewState.setAdapter(adapterRealm)
         this.connectivityManager = connectivityManager
-        sendRequest()
     }
 
     fun switchToFavorites(){
@@ -57,6 +56,7 @@ class NewsPresenter: MvpPresenter<NewsView>(),
 
     fun switchToApi(){
         viewState.setAdapter(adapterApi)
+        sendRequest()
     }
 
     /*
@@ -102,32 +102,34 @@ class NewsPresenter: MvpPresenter<NewsView>(),
                     .subscribe { response ->
                         Log.i("presenter", "doOnNext")
                         val code = response.code().toString()
+                        var toastText = ""
                         when { // Handling HTTP response code
                             code.startsWith("1") -> {
-                                viewState.showToast("informational $code")
+                                toastText = "informational $code"
                             }
                             code.startsWith("2") -> {
-                                viewState.showToast("success $code")
+                                toastText = "success $code"
                                 onReceiveResponse(response!!)
                             }
                             code.startsWith("3") -> {
-                                viewState.showToast("redirection $code")
+                                toastText = "redirection $code"
                             }
                             code.startsWith("4") -> {
-                                viewState.showToast("client error $code")
+                                toastText = "client error $code"
                             }
                             code.startsWith("5") -> {
-                                viewState.showToast("server error $code")
+                                toastText = "server error $code"
                             }
                         }
+                        viewState.showToast(toastText)
                     }
+        } else {
+            viewState.showToast("You are offline")
         }
     }
     // OnRealmArticleInteraction *******************************************************************
     override fun removeFromFavorites(article: RealmArticle) {
-        realm.beginTransaction()
-        realmArticlesList.deleteFromRealm(realmArticlesList.indexOf(article))
-        realm.commitTransaction()
+        localRepo.remove(article)
         adapterRealm.notifyDataSetChanged()
     }
 
@@ -140,9 +142,7 @@ class NewsPresenter: MvpPresenter<NewsView>(),
     }
 
     override fun onDownload(article: ApiArticle) {
-        realm.beginTransaction()
-        realm.copyToRealm(RealmArticle().realmArticleFromApiArticle(article))
-        realm.commitTransaction()
+        localRepo.create(RealmArticle().realmArticleFromApiArticle(article))
         adapterRealm.notifyDataSetChanged()
     }
 

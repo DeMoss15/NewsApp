@@ -10,6 +10,7 @@ import ua.com.demoss.newsapp.di.module.AppModule
 import ua.com.demoss.newsapp.di.module.OkHttpModule
 import ua.com.demoss.newsapp.di.module.RetrofitModule
 import ua.com.demoss.newsapp.model.api.NewsApi
+import ua.com.demoss.newsapp.model.repository.local.ArticleLocalRepository
 import javax.inject.Singleton
 
 @Component(modules = [AppModule::class,
@@ -23,4 +24,5 @@ interface AppComponent {
     fun client(): OkHttpClient
     fun retrofit(): Retrofit
     fun newsApi(): NewsApi
+    fun articleLocalRepository(): ArticleLocalRepository
 }

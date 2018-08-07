@@ -2,6 +2,7 @@ package ua.com.demoss.newsapp.model.api.response
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import ua.com.demoss.newsapp.model.entity.Article
 
 data class ApiArticle(
         @SerializedName("source")
@@ -31,4 +32,12 @@ data class ApiArticle(
         @SerializedName("publishedAt")
         @Expose
         val publishedAt: String?
-) {}
+): Article {
+    override fun getName(): String {
+        return title!!
+    }
+
+    override fun getImage(): String {
+        return urlToImage!!
+    }
+}

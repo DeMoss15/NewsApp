@@ -4,6 +4,7 @@ import dagger.Component
 import ua.com.demoss.newsapp.di.PresenterScope
 import ua.com.demoss.newsapp.di.module.NewsPresenterModule
 import ua.com.demoss.newsapp.model.api.NewsApi
+import ua.com.demoss.newsapp.model.repository.local.ArticleLocalRepository
 
 @PresenterScope
 @Component(dependencies = [AppComponent::class],
@@ -11,4 +12,5 @@ import ua.com.demoss.newsapp.model.api.NewsApi
 interface NewsPresenterComponent {
 
     fun newsApi(): NewsApi
+    fun localRepository(): ArticleLocalRepository
 }

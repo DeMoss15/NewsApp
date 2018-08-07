@@ -31,6 +31,7 @@ class RealmArticlesRecyclerViewAdapter(
         Glide.with(holder.view.context)
                 .load(holder.item.urlToImage)
                 .into(holder.imageView)
+
         holder.imageButton.setImageResource(R.drawable.ic_close_24dp)
         holder.imageButton.setOnClickListener { listener.removeFromFavorites(holder.item) }
         holder.imageButtonShare.visibility = View.GONE
